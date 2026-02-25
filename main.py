@@ -22,14 +22,13 @@ while running:
     next_state = current_state.handle_events(events)
     if next_state == GameState.QUIT:
         running = False
-    elif next_state is not None:
+    elif next_state != GameState.STAY:
         # Here we would normally switch to the new state, e.g.:
         # if next_state == GameState.MAIN_MENU:
         #     current_state = MainMenuScreen(screen)
         running = False  # For now, exit after splash
 
     current_state.update()
-
     current_state.draw()
     pygame.display.flip()
     clock.tick(GAME_FPS)

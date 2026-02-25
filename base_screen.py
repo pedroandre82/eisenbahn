@@ -10,17 +10,17 @@ class BaseScreen:
         self.screen = screen
     
     # @abstractmethod
-    def handle_events(self, events) -> GameState | None:
+    def handle_events(self, events) -> GameState:
         """Process events and return next GameState if changing, else None."""
         for event in events:
             if event.type == pygame.QUIT:
                 return GameState.QUIT
-        return None
+        return GameState.STAY  # Indicate no state change by default
     
     # @abstractmethod
-    def update(self) -> GameState | None:
+    def update(self):
         """Update screen logic (e.g., timers). Return next state or None."""
-        return None
+        pass
     
     # @abstractmethod
     def draw(self):

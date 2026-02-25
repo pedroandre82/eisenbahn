@@ -19,3 +19,4 @@ class GameState(Enum):
     WIN = "win"
     LOSE = "lose"
     QUIT = "quit"
+    STAY = "stay"  # Special state to indicate no change
