@@ -1,6 +1,7 @@
 import pygame
 import sys
 from constants import GAME_FPS, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
+from screens.main_menu import MainMenuScreen
 from screens.splash_screen import SplashScreen
 
 
@@ -23,10 +24,21 @@ while running:
     if next_state == GameState.QUIT:
         running = False
     elif next_state != GameState.STAY:
-        # Here we would normally switch to the new state, e.g.:
-        # if next_state == GameState.MAIN_MENU:
-        #     current_state = MainMenuScreen(screen)
-        running = False  # For now, exit after splash
+        if next_state == GameState.MAIN_MENU:  
+            current_state = MainMenuScreen(screen)
+        elif next_state == GameState.GAMEPLAY:
+            # Placeholder for gameplay screen
+            pass
+        elif next_state == GameState.SETTINGS:
+            # Placeholder for settings screen
+            pass
+        elif next_state == GameState.CREDITS:
+            # Placeholder for credits screen
+            pass
+        elif next_state == GameState.PAUSE:
+            # Placeholder for pause screen
+            pass
+
 
     current_state.update()
     current_state.draw()

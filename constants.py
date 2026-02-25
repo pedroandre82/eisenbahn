@@ -20,3 +20,11 @@ class GameState(Enum):
     LOSE = "lose"
     QUIT = "quit"
     STAY = "stay"  # Special state to indicate no change
+
+
+class MainMenuOption(Enum):
+    """Options in the main menu."""
+    START_GAME = "Start Game"
+    SETTINGS = "Settings"
+    CREDITS = "Credits"
+    QUIT = "Quit"
