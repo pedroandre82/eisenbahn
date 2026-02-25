@@ -33,6 +33,6 @@ while running:
     pygame.display.flip()
     clock.tick(GAME_FPS)
 
-
+print("Exiting game...")
 pygame.quit()
 sys.exit()

@@ -15,16 +15,22 @@ class SplashScreen(BaseScreen):
     def handle_events(self, events) -> GameState:
         for event in events:
             if event.type == pygame.QUIT:
+                print("Quit event received in splash screen")
                 return GameState.QUIT
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE] or self.skip:  # Skip splash on ESC
-            # print("Skipping splash screen")
+        if self.skip:
             return GameState.MAIN_MENU
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:  # Skip splash on ESC
+            print("Skipping splash screen")
+            self.skip = True
         return GameState.STAY  # No state change
 
     def update(self):
+        if self.skip:
+            return
         self.ticks += 1
         if self.ticks > self.splash_time / 1000 * GAME_FPS:
+            print("Splash time expired")
             self.skip = True  # Mark to skip on next event check
 
     def draw(self):
