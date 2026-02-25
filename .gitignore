@@ -1,0 +1,18 @@
+# Dependencies
+__pycache__/
+.venv/
+
+
+# IDE and editor files
+.vscode/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.bak
