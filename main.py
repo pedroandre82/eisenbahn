@@ -3,6 +3,7 @@ import sys
 from constants import GAME_FPS, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
 from screens.main_menu import MainMenuScreen
 from screens.splash_screen import SplashScreen
+from screens.settings_screen import SettingsScreen
 
 
 # Initialize Pygame
@@ -30,8 +31,7 @@ while running:
             # Placeholder for gameplay screen
             pass
         elif next_state == GameState.SETTINGS:
-            # Placeholder for settings screen
-            pass
+            current_state = SettingsScreen(screen)
         elif next_state == GameState.CREDITS:
             # Placeholder for credits screen
             pass

@@ -2,6 +2,11 @@ import pygame
 from base_screen import BaseScreen
 from constants import GAME_FPS, GameState
 
+# BACKGROUND_COLOR = "#183A37"
+BACKGROUND_COLOR = "#432534"
+# TEXT_COLOR = "#432534"
+TEXT_COLOR = "#EFD6AC"
+
 
 class SplashScreen(BaseScreen):
     """Splash screen shown at game start."""
@@ -34,21 +39,19 @@ class SplashScreen(BaseScreen):
             self.skip = True  # Mark to skip on next event check
 
     def draw(self):
-        BLUE = (0, 100, 200)
-        WHITE = (255, 255, 255)
         SCREEN_WIDTH, SCREEN_HEIGHT = self.screen.get_size()
 
         # Fill background
-        self.screen.fill(BLUE)
+        self.screen.fill(BACKGROUND_COLOR)
 
         # Draw splash text
         main_font = pygame.font.Font(None, 74)
-        text = main_font.render("Eisenbahn", True, WHITE)
+        text = main_font.render("Eisenbahn", True, TEXT_COLOR)
         text_rect = text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
         self.screen.blit(text, text_rect)
 
         # Small subtitle
         small_font = pygame.font.Font(None, 36)
-        subtitle = small_font.render("Press ESC to skip or wait...", True, WHITE)
+        subtitle = small_font.render("Press ESC to skip or wait...", True, TEXT_COLOR)
         subtitle_rect = subtitle.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 100))
         self.screen.blit(subtitle, subtitle_rect)

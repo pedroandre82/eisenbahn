@@ -7,6 +7,14 @@ SCREEN_HEIGHT = 600
 
 GAME_FPS = 60
 
+# COLORS
+class Colors(Enum):
+    BLACK = "#04151F"  # INK_BLACK
+    GREEN = "#183A37"  # DARK GREEN
+    WHITE = "#EFD6AC"  # WHEAT
+    ORANGE = "#C44900"
+    CYAN = "#62929E"  # PACIFIC_CYAN
+
 
 class GameState(Enum):
     """Game screen states matching our flowchart."""

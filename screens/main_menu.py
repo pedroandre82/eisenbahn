@@ -1,17 +1,18 @@
 import pygame
 from base_screen import BaseScreen
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH, GameState, MainMenuOption
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH, GameState, MainMenuOption, Colors
 
 
-BACKGROUND_COLOR = (50, 50, 50)
-BUTTON_COLOR = (100, 100, 200)
-BUTTON_HOVER_COLOR = (150, 150, 250)
-TEXT_COLOR = (255, 255, 255)
-TEXT_HIGHLIGHT_COLOR = (255, 255, 0)
+BACKGROUND_COLOR = Colors.BLACK.value
+BUTTON_COLOR = Colors.GREEN.value
+BUTTON_HOVER_COLOR = Colors.CYAN.value
+TEXT_COLOR = Colors.WHITE.value
+TEXT_HIGHLIGHT_COLOR = Colors.CYAN.value
 
+FONT_PATH = "assets/fonts/BitcountPropSingle-Regular.ttf"
 FONT_SIZE = 36
 BUTTON_HEIGHT = 50
-BUTTON_WIDTH = 200
+BUTTON_WIDTH = 250
 BUTTON_SPACING = 20
 
 
@@ -20,7 +21,6 @@ class MainMenuScreen(BaseScreen):
 
     def __init__(self, screen):
         super().__init__(screen)
-        # self.options = ["Start Game", "Settings", "Credits", "Quit"]
         self.selected_index = 0  # Start game is selected by default
         
         # define buttons rectangles for click detection
@@ -59,6 +59,9 @@ class MainMenuScreen(BaseScreen):
                         return GameState.CREDITS
                     elif selected_option == MainMenuOption.QUIT:
                         return GameState.QUIT
+                elif event.key == pygame.K_ESCAPE:
+                    print(f"ESC pressed, quitting game.")
+                    return GameState.QUIT
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
                 mouse_pos = event.pos
@@ -86,14 +89,12 @@ class MainMenuScreen(BaseScreen):
 
     def draw(self):
         self.screen.fill(BACKGROUND_COLOR)
-        font = pygame.font.Font(None, FONT_SIZE)
+        font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
         for i, (option, rect) in enumerate(self.buttons):
-            pygame.draw.rect(self.screen, BUTTON_COLOR, rect)
+            pygame.draw.rect(self.screen, BUTTON_COLOR, rect, border_radius=10)
             if i == self.selected_index:
-                pygame.draw.rect(self.screen, BUTTON_HOVER_COLOR, rect, 4)
-            # color = BUTTON_HOVER_COLOR if i == self.selected_index else BUTTON_COLOR
-            # width = 4 if i == self.selected_index else 0
+                pygame.draw.rect(self.screen, BUTTON_HOVER_COLOR, rect, width=2, border_radius=10)
             text = font.render(option.value, True, TEXT_COLOR if i != self.selected_index else TEXT_HIGHLIGHT_COLOR)
             text_rect = text.get_rect(center=rect.center)
             self.screen.blit(text, text_rect)
