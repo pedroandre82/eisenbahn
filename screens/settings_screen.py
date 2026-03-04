@@ -92,12 +92,6 @@ class SettingsScreen(BaseScreen):
                 self.screen.blit(value_surface, value_rect)
                 # Highlight current value
                 if i == self.current_option and j == option["current"]:
-                    pygame.draw.rect(
-                        self.screen, 
-                        HIGHLIGHT_COLOR, 
-                        value_rect.inflate(10, 10).move(-3, 0), 
-                        width=2, 
-                        border_radius=5,
-                    )
+                    pygame.draw.rect( self.screen, HIGHLIGHT_COLOR, value_rect.inflate(10, 10).move(-3, 0), width=2, border_radius=5)
 
 

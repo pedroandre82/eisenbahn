@@ -1,11 +1,9 @@
 import pygame
 from base_screen import BaseScreen
-from constants import GAME_FPS, GameState
+from constants import GAME_FPS, GameState, Colors
 
-# BACKGROUND_COLOR = "#183A37"
-BACKGROUND_COLOR = "#432534"
-# TEXT_COLOR = "#432534"
-TEXT_COLOR = "#EFD6AC"
+BACKGROUND_COLOR = Colors.BLACK.value
+TEXT_COLOR = Colors.CYAN.value
 
 
 class SplashScreen(BaseScreen):
@@ -13,7 +11,7 @@ class SplashScreen(BaseScreen):
 
     def __init__(self, screen):
         super().__init__(screen)
-        self.splash_time = 4000  # ms
+        self.splash_time = 2000  # ms
         self.ticks = 0
         self.skip = False
 
