@@ -11,7 +11,7 @@ class SplashScreen(BaseScreen):
 
     def __init__(self, screen):
         super().__init__(screen)
-        self.splash_time = 2000  # ms
+        self.splash_time = 1000  # ms
         self.ticks = 0
         self.skip = False
 

@@ -4,7 +4,7 @@ from constants import GAME_FPS, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
 from screens.main_menu import MainMenuScreen
 from screens.splash_screen import SplashScreen
 from screens.settings_screen import SettingsScreen
-from screens.gameplay import GameplayScreen
+from screens.gameplay import BouncingBall, HexTile
 
 
 # Initialize Pygame
@@ -29,7 +29,8 @@ while running:
         if next_state == GameState.MAIN_MENU:  
             current_state = MainMenuScreen(screen)
         elif next_state == GameState.GAMEPLAY:
-            current_state = GameplayScreen(screen)
+            # current_state = BouncingBall(screen)
+            current_state = HexTile(screen)
         elif next_state == GameState.SETTINGS:
             current_state = SettingsScreen(screen)
         elif next_state == GameState.CREDITS:

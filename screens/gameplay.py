@@ -3,11 +3,12 @@
 import pygame
 from base_screen import BaseScreen
 from constants import Colors, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
+from tiles import curved_track, draw_hex, straight_track
 
 FONT_PATH = "assets/fonts/BitcountPropSingle-Regular.ttf"
 
 
-class GameplayScreen(BaseScreen):
+class BouncingBall(BaseScreen):
     """Gameplay screen with a bouncing circle."""
 
     def __init__(self, screen):
@@ -96,3 +97,38 @@ class GameplayScreen(BaseScreen):
             self.draw_pause_menu()
 
         
+class HexTile(BaseScreen):
+    """Placeholder for hex tile rendering."""
+    def __init__(self, screen):
+        super().__init__(screen)
+
+    def handle_events(self, events) -> GameState:
+        for event in events:
+            if event.type == pygame.QUIT:
+                return GameState.QUIT
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return GameState.MAIN_MENU
+                
+        return GameState.STAY
+
+    def update(self):
+        pass
+
+    def draw(self):
+        self.screen.fill(Colors.BLACK.value)
+        # Example hex tiles width increasing sizes to test drawing functions
+        for i in range(1, 8):
+            tile_size = 12 * i
+            center = pygame.math.Vector2(50 + i * tile_size, SCREEN_HEIGHT // 2)
+            draw_hex(self.screen, center, tile_size, Colors.CYAN.value)
+            straight_track(self.screen, center, tile_size)
+            curved_track(self.screen, center, tile_size, 0)
+        # tile_size = 24
+        # draw_hex(self.screen, pygame.math.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), tile_size, Colors.CYAN.value)
+        # straight_track(self.screen, pygame.math.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), tile_size)
+        # curved_track(self.screen, pygame.math.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), tile_size, 0)
+
+
+    
