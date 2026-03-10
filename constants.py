@@ -1,4 +1,8 @@
+# constants.py
+
 from enum import Enum
+
+GAME_TITLE = "EISENBAHN"
 
 
 # WINDOW SIZE

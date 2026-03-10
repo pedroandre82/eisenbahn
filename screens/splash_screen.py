@@ -1,9 +1,14 @@
-import pygame
+# screens/splash_screen.py
+
+import pygame  # type: ignore
 from base_screen import BaseScreen
 from constants import GAME_FPS, GameState, Colors
 
 BACKGROUND_COLOR = Colors.BLACK.value
 TEXT_COLOR = Colors.CYAN.value
+
+TITLE_FONT_PATH = "assets/fonts/Frijole-Regular.ttf"
+SUBTITLE_FONT_PATH = "assets/fonts/RubikMonoOne-Regular.ttf"
 
 
 class SplashScreen(BaseScreen):
@@ -11,7 +16,7 @@ class SplashScreen(BaseScreen):
 
     def __init__(self, screen):
         super().__init__(screen)
-        self.splash_time = 1000  # ms
+        self.splash_time = 10_000  # ms
         self.ticks = 0
         self.skip = False
 
@@ -43,13 +48,13 @@ class SplashScreen(BaseScreen):
         self.screen.fill(BACKGROUND_COLOR)
 
         # Draw splash text
-        main_font = pygame.font.Font(None, 74)
-        text = main_font.render("Eisenbahn", True, TEXT_COLOR)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+        main_font = pygame.font.Font(TITLE_FONT_PATH, 96)
+        text = main_font.render("EISENBAHN", True, TEXT_COLOR)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//3))
         self.screen.blit(text, text_rect)
 
         # Small subtitle
-        small_font = pygame.font.Font(None, 36)
+        small_font = pygame.font.Font(SUBTITLE_FONT_PATH, 24)
         subtitle = small_font.render("Press ESC to skip or wait...", True, TEXT_COLOR)
         subtitle_rect = subtitle.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 100))
         self.screen.blit(subtitle, subtitle_rect)
