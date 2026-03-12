@@ -4,14 +4,13 @@ from enum import Enum
 
 GAME_TITLE = "EISENBAHN"
 
-
 # WINDOW SIZE
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
 GAME_FPS = 60
 
-# COLORS
+
 class Colors(Enum):
     BLACK = "#04151F"  # INK_BLACK
     GREEN = "#183A37"  # DARK GREEN

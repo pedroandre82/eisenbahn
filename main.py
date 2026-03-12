@@ -2,19 +2,19 @@
 
 import pygame
 import sys
-from constants import GAME_FPS, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import GAME_FPS, GAME_TITLE, GameState, SCREEN_WIDTH, SCREEN_HEIGHT
 from screens.main_menu import MainMenuScreen
 from screens.splash_screen import SplashScreen
 from screens.settings_screen import SettingsScreen
-from screens.gameplay import BouncingBall, HexTile, GameplayScreen
+from screens.gameplay import GameplayScreen
 
 
 # Initialize Pygame
 pygame.init()
 
-# Create screen
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Eisenbahn")
+# Create screen with fixed size, no frame, not resizable and set caption
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
+pygame.display.set_caption(GAME_TITLE)
 clock = pygame.time.Clock()
 
 # State manager; Start with splash screen
@@ -31,8 +31,6 @@ while running:
         if next_state == GameState.MAIN_MENU:  
             current_state = MainMenuScreen(screen)
         elif next_state == GameState.GAMEPLAY:
-            # current_state = BouncingBall(screen)
-            # current_state = HexTile(screen)
             current_state = GameplayScreen(screen)
         elif next_state == GameState.SETTINGS:
             current_state = SettingsScreen(screen)

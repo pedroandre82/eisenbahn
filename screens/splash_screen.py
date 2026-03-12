@@ -2,7 +2,7 @@
 
 import pygame  # type: ignore
 from base_screen import BaseScreen
-from constants import GAME_FPS, GameState, Colors
+from constants import GAME_FPS, GAME_TITLE, GameState, Colors
 
 BACKGROUND_COLOR = Colors.BLACK.value
 TEXT_COLOR = Colors.CYAN.value
@@ -49,7 +49,7 @@ class SplashScreen(BaseScreen):
 
         # Draw splash text
         main_font = pygame.font.Font(TITLE_FONT_PATH, 96)
-        text = main_font.render("EISENBAHN", True, TEXT_COLOR)
+        text = main_font.render(GAME_TITLE, True, TEXT_COLOR)
         text_rect = text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//3))
         self.screen.blit(text, text_rect)
 

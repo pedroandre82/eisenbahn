@@ -28,49 +28,17 @@ def draw_hex(surface, center: Vector2, size, color, line_width=1):
     pygame.draw.polygon(surface, color, points, line_width)
 
 
-def straight_track(surface, center: Vector2, size):
-    c = Vector2(size, 0).rotate(30)
-    
-    color = COLOR_BASE
-    base_width = size // 2  # 12
-    x = Vector2(c.x, 0)
-    pygame.draw.line(surface, color, center - x, center + x, base_width)
-
-    color = COLOR_SIDE
-    side_width = size // 12  # 2
-    offset = base_width // 2 - side_width // 2
-    x1 = Vector2(-c.x, offset)
-    x2 = Vector2(c.x, offset)
-    pygame.draw.line(surface, color, center + x1, center + x2, side_width)
-    pygame.draw.line(surface, color, center - x2, center - x1, side_width)
-
-    color = COLOR_TRACK
-    track_width = size // 4  # 6
-    pygame.draw.line(surface, color, center - x, center + x, track_width)
+def straight_track(surface, center: Vector2, size, direction):
+    c = Vector2(size * math.sqrt(3) / 2, 0).rotate(direction * 60)
+    pygame.draw.line(surface, COLOR_BASE, center - c, center + c, size // 2)
+    pygame.draw.line(surface, COLOR_TRACK, center - c, center + c, size // 4)
 
 
 def curved_track(surface, center: Vector2, size, direction):
     center_point = center + Vector2(0, size).rotate(60) + Vector2(0, size)
+    center_point.rotate_ip(direction * 60)
     start_angle = 330 + direction * 60
     end_angle = 270 + direction * 60
-    
-    side_width = size // 9
-    track_width = size // 2  - side_width // 2
-    base_width = size // 18
-
-    color = COLOR_TRACK
-    track_radius = 3 * size // 2
-    draw_arc(surface, center_point, track_radius, start_angle, end_angle, color, track_width)
-
-    color = COLOR_SIDE
-    inner_side_radius = track_radius - track_width // 2 + side_width // 2
-    draw_arc(surface, center_point, inner_side_radius, start_angle, end_angle, color, side_width)
-    outter_side_radius = inner_side_radius + track_width
-    draw_arc(surface, center_point, outter_side_radius, start_angle, end_angle, color, side_width)
-
-    color = COLOR_BASE
-    inner_base_radius = inner_side_radius + side_width // 2
-    draw_arc(surface, center_point, inner_base_radius, start_angle, end_angle, color, base_width)
-    outter_base_radius = outter_side_radius - side_width // 2
-    draw_arc(surface, center_point, outter_base_radius, start_angle, end_angle, color, base_width)
-    
+    radius = 3 * size // 2
+    draw_arc(surface, center_point, radius, start_angle, end_angle, COLOR_BASE, size // 2)
+    draw_arc(surface, center_point, radius, start_angle, end_angle, COLOR_TRACK, size // 4)

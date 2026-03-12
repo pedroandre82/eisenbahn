@@ -1,4 +1,4 @@
-# screens/hex_grid.py
+# hex_grid.py
 import math
 
 HEX_SIZE = 36          # radius (center to corner)
