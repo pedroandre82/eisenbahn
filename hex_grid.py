@@ -1,5 +1,6 @@
 # hex_grid.py
 import math
+from hex_tile import HexTile
 
 HEX_SIZE = 36          # radius (center to corner)
 GRID_ORIGIN_X = 340    # left border of hex area
@@ -60,3 +61,21 @@ def axial_round(q, r):
         rs = -rq - rr
 
     return int(rq), int(rr)
+
+
+class GridManager:
+    def __init__(self, grid_size: tuple[int, int]):
+        self.grid_size = grid_size
+        self.grid: list[list[HexTile]] = [[HexTile(col, row) for row in range(grid_size[1])] for col in range(grid_size[0])]
+
+    def get_tile(self, col: int, row: int) -> HexTile:
+        if 0 <= col < self.grid_size[0] and 0 <= row < self.grid_size[1]:
+            return self.grid[col][row]
+        else:
+            raise IndexError("Tile coordinates out of bounds")
+        
+    def set_tile(self, col: int, row: int, tile: HexTile):
+        if 0 <= col < self.grid_size[0] and 0 <= row < self.grid_size[1]:
+            self.grid[col][row] = tile
+        else:
+            raise IndexError("Tile coordinates out of bounds")

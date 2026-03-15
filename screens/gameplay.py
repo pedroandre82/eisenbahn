@@ -3,7 +3,7 @@
 import pygame
 from base_screen import BaseScreen
 from constants import Colors, GameState, SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE
-from tiles import curved_track, draw_hex, straight_track
+from tracks import curved_track, draw_hex, straight_track
 from hex_grid import HEX_SIZE, GRID_COLS, GRID_ROWS, oddr_to_pixel, pixel_to_oddr
 
 
