@@ -11,6 +11,13 @@ FONT_PATH = "assets/fonts/BitcountPropSingle-Regular.ttf"
 TITLE_FONT_PATH = "assets/fonts/Frijole-Regular.ttf"
 TEXT_FONT_PATH = "assets/fonts/RubikMonoOne-Regular.ttf"
 
+STRAIGHT_TRACK_BUTTON_CENTER = pygame.Vector2(85, 250)
+CURVED_TRACK_BUTTON_CENTER = pygame.Vector2(215, 250)
+TRACK_BUTTON_SIZE = 48
+BUTTON_BORDER_COLOR = Colors.GREEN.value
+BUTTON_HIGHLIGHT_COLOR = Colors.WHITE.value
+BUTTON_SELECTED_COLOR = Colors.ORANGE.value
+
 
 class GameplayScreen(BaseScreen):
     """Main gameplay screen."""
@@ -22,6 +29,7 @@ class GameplayScreen(BaseScreen):
         self.text_font = pygame.font.Font(TEXT_FONT_PATH, 16)
         self.pause = False
         self.pause_option = 0  # 0: Resume, 1: Main Menu
+        self.selected_track_type = None  # 'straight' or 'curved'
 
     def draw_pause_menu(self):
         # Draw a semi-transparent overlay
@@ -69,8 +77,37 @@ class GameplayScreen(BaseScreen):
                         elif self.pause_option == 1:  # Main Menu
                             print("Returning to main menu from pause menu")
                             return GameState.MAIN_MENU
+                        
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.pause:
+                    continue  # Ignore mouse clicks when paused
+                mouse_pos = pygame.mouse.get_pos()
+                if (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE:
+                    self.selected_track_type = 'straight' if self.selected_track_type != 'straight' else None
+                elif (CURVED_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE:
+                    self.selected_track_type = 'curved' if self.selected_track_type != 'curved' else None
+                else:
+                    self.selected_track_type = None
                 
         return GameState.STAY
+    
+    def draw_buttons(self):
+        straight_track(self.screen, STRAIGHT_TRACK_BUTTON_CENTER, TRACK_BUTTON_SIZE, direction=0)
+        curved_track(self.screen, CURVED_TRACK_BUTTON_CENTER, TRACK_BUTTON_SIZE, direction=0)
+
+        # Check mouse hover for buttons
+        mouse_pos = pygame.mouse.get_pos()
+
+        color = BUTTON_HIGHLIGHT_COLOR if (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE else BUTTON_BORDER_COLOR
+        if self.selected_track_type == 'straight':
+            color = BUTTON_SELECTED_COLOR
+        draw_hex(self.screen, STRAIGHT_TRACK_BUTTON_CENTER, TRACK_BUTTON_SIZE, color, line_width=2)
+
+        color = BUTTON_HIGHLIGHT_COLOR if (CURVED_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE else BUTTON_BORDER_COLOR
+        if self.selected_track_type == 'curved':
+            color = BUTTON_SELECTED_COLOR
+        draw_hex(self.screen, CURVED_TRACK_BUTTON_CENTER, TRACK_BUTTON_SIZE, color, line_width=2)
+
         
     def draw_info_panel(self):
         pygame.draw.rect(self.screen, Colors.CYAN.value, (5, 5, 295, SCREEN_HEIGHT - 10), width=4, border_radius=15)
@@ -87,6 +124,8 @@ class GameplayScreen(BaseScreen):
         hex_text = self.text_font.render(f"Hex: {hex_coords if within_grid else 'None'}", True, Colors.WHITE.value)
         self.screen.blit(hex_text, (15, 100))
 
+        self.draw_buttons()
+        
     def update(self):
         pass
 
