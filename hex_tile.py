@@ -1,6 +1,5 @@
 # hex_tile.py
 
-from typing import FrozenSet
 from enum import Enum
 
 
@@ -14,7 +13,7 @@ class HexTile:
     def __init__(self, q: int, r: int):
         self.q = q
         self.r = r
-        self.built_tracks: set[FrozenSet[int]] = set()  # set of (from_dir, to_dir)
+        self.built_tracks: set[frozenset[int]] = set()  # set of (from_dir, to_dir)
         self.lights: list[LightState] = [LightState.RED] * 6  # Initialize all edges with red lights
 
     def add_track(self, dir1: int, dir2: int) -> bool:

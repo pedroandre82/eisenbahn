@@ -29,18 +29,49 @@ def draw_hex(surface, center: Vector2, size, color, line_width=1):
 
 
 def straight_track(surface, center: Vector2, size, direction):
+    # Vector along the line
     c = Vector2(size * math.sqrt(3) / 2, 0).rotate(direction * 60)
-    pygame.draw.line(surface, COLOR_BASE, center - c, center + c, size // 2)
-    pygame.draw.line(surface, COLOR_TRACK, center - c, center + c, size // 4)
+
+    # Endpoints of the line
+    p1 = center - c
+    p2 = center + c
+
+    # Unit perpendicular vector
+    perp = c.rotate(90).normalize()
+
+    # First polygon (outer/base)
+    half_width = size // 4  # since line width was size//2
+    offset = perp * half_width
+    points_base = [p1 - offset, p1 + offset, p2 + offset, p2 - offset]
+    pygame.draw.polygon(surface, COLOR_BASE, points_base)
+
+    # Second polygon (inner/track)
+    half_width = size // 8  # since line width was size//4
+    offset = perp * half_width
+    points_track = [p1 - offset, p1 + offset, p2 + offset, p2 - offset]
+    pygame.draw.polygon(surface, COLOR_TRACK, points_track)
 
 
 def curved_track(surface, center: Vector2, size, direction):
-    center_point = center + Vector2(0, size).rotate(60) + Vector2(0, size)
-    center_point.rotate_ip(direction * 60)
+    center_vector = Vector2(0, size).rotate(60) + Vector2(0, size)
+    center_vector.rotate_ip(direction * 60)
     start_angle = 330 + direction * 60
     end_angle = 270 + direction * 60
     radius = 3 * size // 2
-    draw_arc(surface, center_point, radius, start_angle, end_angle, COLOR_BASE, size // 2)
-    draw_arc(surface, center_point, radius, start_angle, end_angle, COLOR_TRACK, size // 4)
+    draw_arc(surface, center + center_vector, radius, start_angle, end_angle, COLOR_BASE, size // 2)
+    draw_arc(surface, center + center_vector, radius, start_angle, end_angle, COLOR_TRACK, size // 4)
 
+
+def straight_cursor(surface, center: Vector2, size, direction):
+    c = Vector2(size * math.sqrt(3) / 2, 0).rotate(direction * 60)
+    pygame.draw.line(surface, COLOR_SIDE, center - c, center + c, 4)
+
+
+def curved_cursor(surface, center: Vector2, size, direction):
+    center_vector = Vector2(0, size).rotate(60) + Vector2(0, size)
+    center_vector.rotate_ip(direction * 60)
+    start_angle = 330 + direction * 60
+    end_angle = 270 + direction * 60
+    radius = 3 * size // 2
+    draw_arc(surface, center + center_vector, radius, start_angle, end_angle, COLOR_SIDE, 4)
 

@@ -72,10 +72,10 @@ class GridManager:
         if 0 <= col < self.grid_size[0] and 0 <= row < self.grid_size[1]:
             return self.grid[col][row]
         else:
-            raise IndexError("Tile coordinates out of bounds")
+            raise IndexError(f"Tile coordinates out of bounds {col=}, {row=}")
         
     def set_tile(self, col: int, row: int, tile: HexTile):
         if 0 <= col < self.grid_size[0] and 0 <= row < self.grid_size[1]:
             self.grid[col][row] = tile
         else:
-            raise IndexError("Tile coordinates out of bounds")
+            raise IndexError(f"Tile coordinates out of bounds {col=}, {row=}")

@@ -3,8 +3,8 @@
 import pygame
 from base_screen import BaseScreen
 from constants import Colors, GameState, SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE
-from tracks import curved_track, draw_hex, straight_track
-from hex_grid import HEX_SIZE, GRID_COLS, GRID_ROWS, oddr_to_pixel, pixel_to_oddr
+from tracks import curved_cursor, curved_track, draw_hex, straight_cursor, straight_track
+from hex_grid import HEX_SIZE, GRID_COLS, GRID_ROWS, oddr_to_pixel, pixel_to_oddr, GridManager
 
 
 FONT_PATH = "assets/fonts/BitcountPropSingle-Regular.ttf"
@@ -18,43 +18,56 @@ BUTTON_BORDER_COLOR = Colors.GREEN.value
 BUTTON_HIGHLIGHT_COLOR = Colors.WHITE.value
 BUTTON_SELECTED_COLOR = Colors.ORANGE.value
 
+PAUSE_OPTIONS = ["Resume Game", "Main Menu", "Quit Game"]
+
 
 class GameplayScreen(BaseScreen):
     """Main gameplay screen."""
     def __init__(self, screen: pygame.Surface):
         super().__init__(screen)
         self.screen = screen
+
+        # Side panel setup        
         self._title_font = pygame.font.Font(TITLE_FONT_PATH, 30)
         self.title_text = self._title_font.render(GAME_TITLE, True, Colors.WHITE.value)
         self.text_font = pygame.font.Font(TEXT_FONT_PATH, 16)
-        self.pause = False
-        self.pause_option = 0  # 0: Resume, 1: Main Menu
+        
         self.selected_track_type = None  # 'straight' or 'curved'
+        self.selected_track_direction = 0  # 0-5 for hex directions
+
+        # Pause menu state
+        self.pause = False
+        self.pause_option = 0  # 0: Resume, 1: Main Menu, etc.
+
+        # Pre-render pause menu surfaces
+        self.pause_overlay = pygame.Surface((SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        self.pause_overlay.set_alpha(192)
+        self.pause_overlay.fill(Colors.BLACK.value)
+
+        self.pause_font_title = pygame.font.Font(FONT_PATH, 72)
+        self.pause_title_surf = self.pause_font_title.render("PAUSED", True, Colors.WHITE.value)
+        self.pause_title_rect = self.pause_title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
+        self.pause_overlay.blit(self.pause_title_surf, self.pause_title_rect)
+
+        self.pause_font_item = pygame.font.Font(FONT_PATH, 28)
+        self.pause_option_rects = []
+        for i, option in enumerate(PAUSE_OPTIONS):
+            color = Colors.CYAN.value if i == self.pause_option else Colors.GREEN.value
+            option_surf = self.pause_font_item.render(option, True, color)
+            option_rect = option_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 40))
+            self.pause_option_rects.append(option_rect)
+            # self.pause_overlay.blit(option_surf, option_rect)
+
+        self.grid_manager = GridManager((GRID_COLS, GRID_ROWS))
 
     def draw_pause_menu(self):
-        # Draw a semi-transparent overlay
-        overlay = pygame.Surface((SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-        overlay.set_alpha(192)  # Semi-transparent
-        overlay.fill(Colors.BLACK.value)
-        self.screen.blit(overlay, (SCREEN_WIDTH // 2 - overlay.get_width() // 2, SCREEN_HEIGHT // 2 - overlay.get_height() // 2))
-
-        # Draw pause text
-        font = pygame.font.Font(FONT_PATH, 72)
-        title = font.render("PAUSED", True, Colors.WHITE.value)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
-        self.screen.blit(title, title_rect)
-        
-        # Draw menu
-        resume_font = pygame.font.Font(FONT_PATH, 28)
-        resume_color = Colors.CYAN.value if self.pause_option == 0 else Colors.GREEN.value
-        resume_text = resume_font.render("Resume Game", True, resume_color)
-        resume_rect = resume_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
-        self.screen.blit(resume_text, resume_rect)
-
-        menu_color = Colors.CYAN.value if self.pause_option == 1 else Colors.GREEN.value
-        menu_text = resume_font.render("Main Menu", True, menu_color)
-        menu_rect = menu_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-        self.screen.blit(menu_text, menu_rect)
+        self.screen.blit(self.pause_overlay, (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4))
+        # Draw menu options
+        for i, option in enumerate(PAUSE_OPTIONS):
+            color = Colors.CYAN.value if i == self.pause_option else Colors.GREEN.value
+            option_surf = self.pause_font_item.render(option, True, color)
+            option_rect = option_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 40))
+            self.screen.blit(option_surf, option_rect)
 
     def handle_events(self, events) -> GameState:
         for event in events:
@@ -67,8 +80,11 @@ class GameplayScreen(BaseScreen):
                     self.pause = not self.pause
                 
                 if self.pause:
-                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                        self.pause_option = (self.pause_option + 1) % 2
+                    if event.key == pygame.K_UP:
+                        self.pause_option = (self.pause_option - 1) % len(PAUSE_OPTIONS)
+                        print(f"Pause menu option changed to {self.pause_option}")
+                    elif event.key == pygame.K_DOWN:
+                        self.pause_option = (self.pause_option + 1) % len(PAUSE_OPTIONS)
                         print(f"Pause menu option changed to {self.pause_option}")
                     elif event.key == pygame.K_RETURN:
                         if self.pause_option == 0:  # Resume
@@ -77,17 +93,38 @@ class GameplayScreen(BaseScreen):
                         elif self.pause_option == 1:  # Main Menu
                             print("Returning to main menu from pause menu")
                             return GameState.MAIN_MENU
+                        elif self.pause_option == 2:  # Quit Game
+                            print("Quitting game from pause menu")
+                            return GameState.QUIT
+                    continue  # Skip other key handling when paused
                         
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.pause:
                     continue  # Ignore mouse clicks when paused
+
                 mouse_pos = pygame.mouse.get_pos()
-                if (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE:
-                    self.selected_track_type = 'straight' if self.selected_track_type != 'straight' else None
-                elif (CURVED_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE:
-                    self.selected_track_type = 'curved' if self.selected_track_type != 'curved' else None
-                else:
-                    self.selected_track_type = None
+                hex_coords = pixel_to_oddr(*mouse_pos)
+                inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
+                inside_straight_button = (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE
+                inside_curved_button = (CURVED_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE
+                
+                if event.button == 1:  # Left click
+                    if inside_straight_button:
+                        self.selected_track_type = 'straight' if self.selected_track_type != 'straight' else None
+                    elif inside_curved_button:
+                        self.selected_track_type = 'curved' if self.selected_track_type != 'curved' else None
+                    elif not inside_grid:
+                        self.selected_track_type = None  # Deselect track type if clicking outside grid and buttons
+                    elif inside_grid and self.selected_track_type:
+                        tile = self.grid_manager.get_tile(*hex_coords)
+                        tile.add_track(
+                            self.selected_track_direction, 
+                            (self.selected_track_direction + (3 if self.selected_track_type == 'straight' else 2)) % 6
+                        )
+                
+                if event.button == 3:  # Right click
+                    if inside_grid and self.selected_track_type:
+                        self.selected_track_direction = (self.selected_track_direction + 1) % 6
                 
         return GameState.STAY
     
@@ -118,6 +155,7 @@ class GameplayScreen(BaseScreen):
         mouse_pos = pygame.mouse.get_pos()
         mouse_text = self.text_font.render(f"Mouse: {mouse_pos}", True, Colors.WHITE.value)
         self.screen.blit(mouse_text, (15, 70))
+        
         # Draw hex coordinates under mouse if within grid
         hex_coords = pixel_to_oddr(*mouse_pos)
         within_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
@@ -127,27 +165,50 @@ class GameplayScreen(BaseScreen):
         self.draw_buttons()
         
     def update(self):
-        pass
+        if self.pause:
+            mouse_pos = pygame.mouse.get_pos()
+            for i, option_rect in enumerate(self.pause_option_rects):
+                if option_rect.collidepoint(mouse_pos):
+                    self.pause_option = i
 
     def draw(self):
-        if self.pause:
-            self.draw_pause_menu()
-            return
-
         self.screen.fill(Colors.BLACK.value)
-        self.draw_info_panel()
-
         # Draw hex grid
         for row in range(GRID_ROWS):
             for col in range(GRID_COLS):
                 cx, cy = oddr_to_pixel(col, row)
                 center = pygame.math.Vector2(cx, cy)
                 draw_hex(self.screen, center, HEX_SIZE, Colors.CYAN.value)
+                tile = self.grid_manager.get_tile(col, row)
+                for track in tile.built_tracks:
+                    dir1, dir2 = track
+                    if (dir1 - dir2) % 6 == 3:  # Straight track
+                        straight_track(self.screen, center, HEX_SIZE, direction=dir1)
+                    else:  # Curved track
+                        curved_track(self.screen, center, HEX_SIZE, direction=dir1)
 
-        # Highlight hex under mouse
+        if self.pause:
+            self.draw_pause_menu()
+            return
+        
         mouse_pos = pygame.mouse.get_pos()
         hex_coords = pixel_to_oddr(*mouse_pos)
+        inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
+
+        self.draw_info_panel()
+
+        # Highlight hex under mouse
         if 0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS:
             cx, cy = oddr_to_pixel(*hex_coords)
             center = pygame.math.Vector2(cx, cy)
             draw_hex(self.screen, center, HEX_SIZE, Colors.ORANGE.value, line_width=2)
+
+        if inside_grid and self.selected_track_type:
+            pygame.mouse.set_visible(False)
+            center = pygame.math.Vector2(*oddr_to_pixel(*hex_coords))
+            if self.selected_track_type == 'straight':
+                straight_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
+            else:
+                curved_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
+        else:
+            pygame.mouse.set_visible(True)
