@@ -19,7 +19,8 @@ class PauseMenu:
         
         w, h = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
         self.overlay = pygame.Surface((w, h), pygame.SRCALPHA)
-        self.overlay.set_alpha(192)
+        self.overlay.set_alpha(240)
+        self.overlay.fill(Colors.BLACK.value)
 
         self.title_font = pygame.font.Font(FONT_PATH, 72)
         self.item_font = pygame.font.Font(FONT_PATH, 28)
