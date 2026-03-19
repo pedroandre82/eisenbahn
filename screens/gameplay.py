@@ -42,6 +42,8 @@ class GameplayScreen(BaseScreen):
         self.grid_manager = GridManager((GRID_COLS, GRID_ROWS))
 
     def handle_events(self, events) -> GameState:
+        mouse_pos = pygame.mouse.get_pos()
+
         for event in events:
             if event.type == pygame.QUIT:
                 return GameState.QUIT
@@ -51,7 +53,7 @@ class GameplayScreen(BaseScreen):
                 self.pause = not self.pause
                 
             if self.pause:
-                result = self.pause_menu.handle_events(events)
+                result = self.pause_menu.handle_events(events, mouse_pos)
                 if result == GameState.GAMEPLAY:
                     self.pause = False
                 elif result != GameState.STAY:
@@ -62,7 +64,6 @@ class GameplayScreen(BaseScreen):
                 if self.pause:
                     continue  # Ignore mouse clicks when paused
 
-                mouse_pos = pygame.mouse.get_pos()
                 hex_coords = pixel_to_oddr(*mouse_pos)
                 inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
                 inside_straight_button = (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE
@@ -84,7 +85,8 @@ class GameplayScreen(BaseScreen):
                 
                 if event.button == 3:  # Right click
                     if inside_grid and self.selected_track_type:
-                        self.selected_track_direction = (self.selected_track_direction + 1) % 6
+                        self.selected_track_direction = (self.selected_track_direction + 1)
+                        self.selected_track_direction %= 6 if self.selected_track_type == 'curved' else 3
                 
         return GameState.STAY
     
@@ -108,22 +110,21 @@ class GameplayScreen(BaseScreen):
         
     def draw_info_panel(self):
         pygame.draw.rect(self.screen, Colors.CYAN.value, (5, 5, 295, SCREEN_HEIGHT - 10), width=4, border_radius=15)
+
         # Draw title
         title_rect = self.title_text.get_rect(center=(150, 30))
         self.screen.blit(self.title_text, title_rect)
-        # Draw mouse position
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_text = self.text_font.render(f"Mouse: {mouse_pos}", True, Colors.WHITE.value)
-        self.screen.blit(mouse_text, (15, 70))
-        # Draw selected track type and direction
-        track_text = self.text_font.render(f"Selected Track: {self.selected_track_type or 'None'} Dir: {self.selected_track_direction}", True, Colors.WHITE.value)
-        self.screen.blit(track_text, (15, 85))
+
+        # # Draw mouse position
+        # mouse_pos = pygame.mouse.get_pos()
+        # mouse_text = self.text_font.render(f"Mouse: {mouse_pos}", True, Colors.WHITE.value)
+        # self.screen.blit(mouse_text, (15, 70))
         
-        # Draw hex coordinates under mouse if within grid
-        hex_coords = pixel_to_oddr(*mouse_pos)
-        within_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
-        hex_text = self.text_font.render(f"Hex: {hex_coords if within_grid else 'None'}", True, Colors.WHITE.value)
-        self.screen.blit(hex_text, (15, 100))
+        # # Draw hex coordinates under mouse if within grid
+        # hex_coords = pixel_to_oddr(*mouse_pos)
+        # within_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
+        # hex_text = self.text_font.render(f"Hex: {hex_coords if within_grid else 'None'}", True, Colors.WHITE.value)
+        # self.screen.blit(hex_text, (15, 100))
 
         self.draw_buttons()
         
