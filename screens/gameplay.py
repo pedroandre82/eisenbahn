@@ -41,6 +41,8 @@ class GameplayScreen(BaseScreen):
 
         self.grid_manager = GridManager((GRID_COLS, GRID_ROWS))
 
+        # pygame.mouse.set_visible(False)  # Hide mouse cursor
+
     def handle_events(self, events) -> GameState:
         mouse_pos = pygame.mouse.get_pos()
 
@@ -60,7 +62,7 @@ class GameplayScreen(BaseScreen):
                     return result
                 continue
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 if self.pause:
                     continue  # Ignore mouse clicks when paused
 
@@ -72,8 +74,10 @@ class GameplayScreen(BaseScreen):
                 if event.button == 1:  # Left click
                     if inside_straight_button:
                         self.selected_track_type = 'straight' if self.selected_track_type != 'straight' else None
+                        self.selected_track_direction = 0  # Reset direction when selecting track type
                     elif inside_curved_button:
                         self.selected_track_type = 'curved' if self.selected_track_type != 'curved' else None
+                        self.selected_track_direction = 0  # Reset direction when selecting track type
                     elif not inside_grid:
                         self.selected_track_type = None  # Deselect track type if clicking outside grid and buttons
                     elif inside_grid and self.selected_track_type:
@@ -164,11 +168,15 @@ class GameplayScreen(BaseScreen):
             draw_hex(self.screen, center, HEX_SIZE, Colors.ORANGE.value, line_width=2)
 
         if inside_grid and self.selected_track_type:
-            pygame.mouse.set_visible(False)
+            # if pygame.mouse.get_visible():
+            #     pygame.mouse.set_visible(False)
+            #     print(f"Showing cursor for {self.selected_track_type} track at {hex_coords} with direction {self.selected_track_direction}")
             center = pygame.math.Vector2(*oddr_to_pixel(*hex_coords))
             if self.selected_track_type == 'straight':
                 straight_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
             else:
                 curved_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
-        else:
-            pygame.mouse.set_visible(True)
+        # else:
+        #     if not pygame.mouse.get_visible():
+        #         pygame.mouse.set_visible(True)
+        #         print("Hiding track cursor, showing regular mouse cursor")

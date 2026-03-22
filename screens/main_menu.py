@@ -65,7 +65,7 @@ class MainMenuScreen(BaseScreen):
                     print(f"ESC pressed, quitting game.")
                     return GameState.QUIT
             
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:  # Left click
                 mouse_pos = event.pos
                 for option, rect in self.buttons:
                     if rect.collidepoint(mouse_pos):

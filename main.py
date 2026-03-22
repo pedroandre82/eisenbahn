@@ -17,6 +17,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
 pygame.display.set_caption(GAME_TITLE)
 clock = pygame.time.Clock()
 
+pygame.mouse.set_visible(False)  # Hide mouse cursor
+
+
 # State manager; Start with splash screen
 current_state = SplashScreen(screen)
     

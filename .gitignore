@@ -8,6 +8,7 @@ __pycache__/
 
 # Logs
 *.log
+savetxt.py
 
 # Environment variables
 .env
@@ -16,3 +17,4 @@ __pycache__/
 # Temporary files
 *.tmp
 *.bak
+txt/

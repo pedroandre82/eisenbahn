@@ -56,7 +56,7 @@ class PauseMenu:
                 elif event.key == pygame.K_RETURN:
                     return self.options[self.selected][1]
                 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 for i, rect in enumerate(self.item_rects):
                     if rect.collidepoint(mouse_pos):
                         self.selected = i
