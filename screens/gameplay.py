@@ -86,6 +86,9 @@ class GameplayScreen(BaseScreen):
                             self.selected_track_type,
                             self.selected_track_direction
                         )
+                    elif inside_grid and not self.selected_track_type:
+                        tile = self.grid_manager.get_tile(*hex_coords)
+                        tile.cycle_track()
                 
                 if event.button == 3:  # Right click
                     if inside_grid and self.selected_track_type:
@@ -144,12 +147,7 @@ class GameplayScreen(BaseScreen):
                 center = pygame.math.Vector2(cx, cy)
                 draw_hex(self.screen, center, HEX_SIZE, Colors.CYAN.value)
                 tile = self.grid_manager.get_tile(col, row)
-                for track in tile.built_tracks:
-                    track_type, dir = track
-                    if track_type == 'straight':
-                        straight_track(self.screen, center, HEX_SIZE, direction=dir)
-                    else:
-                        curved_track(self.screen, center, HEX_SIZE, direction=dir)
+                tile.draw_tracks(self.screen, center, HEX_SIZE)
 
         self.draw_info_panel()
         
