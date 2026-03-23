@@ -3,8 +3,8 @@
 import pygame
 from base_screen import BaseScreen
 from constants import Colors, GameState, SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE
-from tracks import curved_cursor, curved_track, draw_hex, straight_cursor, straight_track
-from hex_grid import HEX_SIZE, GRID_COLS, GRID_ROWS, oddr_to_pixel, pixel_to_oddr, GridManager
+from tracks import curved_cursor, curved_track, straight_cursor, straight_track
+from hex_grid import HEX_SIZE, GRID_COLS, GRID_ROWS, oddr_to_pixel, pixel_to_oddr, GridManager, draw_hex
 from .pause_menu import PauseMenu
 
 
@@ -39,7 +39,7 @@ class GameplayScreen(BaseScreen):
         self.pause = False
         self.pause_menu = PauseMenu(self.screen)
 
-        self.grid_manager = GridManager((GRID_COLS, GRID_ROWS))
+        self.grid_manager = GridManager((GRID_COLS, GRID_ROWS), show_grid=False)
 
         # pygame.mouse.set_visible(False)  # Hide mouse cursor
 
@@ -141,14 +141,13 @@ class GameplayScreen(BaseScreen):
     def draw(self):
         self.screen.fill(Colors.BLACK.value)
         # Draw hex grid
-        for row in range(GRID_ROWS):
-            for col in range(GRID_COLS):
-                cx, cy = oddr_to_pixel(col, row)
-                center = pygame.math.Vector2(cx, cy)
-                draw_hex(self.screen, center, HEX_SIZE, Colors.CYAN.value)
-                tile = self.grid_manager.get_tile(col, row)
-                tile.draw_tracks(self.screen, center, HEX_SIZE)
+        if self.grid_manager.show_grid:
+            self.grid_manager.draw_grid(self.screen)
 
+        # Draw tracks
+        self.grid_manager.draw_tracks(self.screen)
+
+        # Draw info panel
         self.draw_info_panel()
         
         if self.pause:
@@ -164,6 +163,13 @@ class GameplayScreen(BaseScreen):
             cx, cy = oddr_to_pixel(*hex_coords)
             center = pygame.math.Vector2(cx, cy)
             draw_hex(self.screen, center, HEX_SIZE, Colors.ORANGE.value, line_width=2)
+            # Highlight active neighbor hexes
+            tile = self.grid_manager.get_tile(*hex_coords)
+            for edges in tile.active_edges:
+                for edge in edges:
+                    neighbor = self.grid_manager.neighbor_in_direction(*hex_coords, edge)
+                    if neighbor:
+                        neighbor.draw_hex_border(self.screen, center, HEX_SIZE, Colors.ORANGE, line_width=1)
 
         if inside_grid and self.selected_track_type:
             # if pygame.mouse.get_visible():

@@ -17,15 +17,6 @@ def draw_arc(surface, center: Vector2, radius, start_angle, end_angle, color, li
     rect = pygame.Rect(0, 0, radius * 2 + line_width, radius * 2 + line_width)
     rect.center = center
     pygame.draw.arc(surface, color, rect, start_rad, end_rad, line_width)
-                       
-
-def draw_hex(surface, center: Vector2, size, color, line_width=1):
-    points = []
-    point_vector = pygame.math.Vector2(1, 0).rotate(30) * size  # Start at 30 degrees for pointy-top hex
-    for _ in range(6):
-        points.append(center + point_vector)
-        point_vector.rotate_ip(60)
-    pygame.draw.polygon(surface, color, points, line_width)
 
 
 def straight_track(surface, center: Vector2, size, direction):
