@@ -66,19 +66,19 @@ def axial_round(q, r):
     return int(rq), int(rr)
 
 
-def draw_hex(surface, center: pygame.math.Vector2, size, color, line_width=1):
+def draw_hex(surface, center: pygame.math.Vector2, size, color: Colors, line_width=1):
     points = []
     point_vector = pygame.math.Vector2(1, 0).rotate(30) * size  # Start at 30 degrees for pointy-top hex
     for _ in range(6):
         points.append(center + point_vector)
         point_vector.rotate_ip(60)
-    pygame.draw.polygon(surface, color, points, line_width)
+    pygame.draw.polygon(surface, color.value, points, line_width)
 
 
 class GridManager:
     def __init__(self, grid_size: tuple[int, int], show_grid: bool = False):
         self.grid_size = grid_size
-        self.grid: list[list[HexTile]] = [[HexTile(col, row) for row in range(grid_size[1])] for col in range(grid_size[0])]
+        self.grid: list[list[HexTile]] = [[HexTile() for row in range(grid_size[1])] for col in range(grid_size[0])]
         
         self.show_grid = show_grid
 
@@ -94,7 +94,7 @@ class GridManager:
         else:
             raise IndexError(f"Tile coordinates out of bounds {col=}, {row=}")
 
-    def neighbor_in_direction(self, col: int, row: int, direction: int) -> HexTile | None:
+    def neighbor_in_direction(self, col: int, row: int, direction: int) -> tuple[int, int] | None:
         if row & 1:  # odd row
             dirs = [(-1, 0), (0, -1), (+1, -1), (+1, 0), (+1, +1), (0, +1)]
         else:        # even row
@@ -103,7 +103,7 @@ class GridManager:
         dc, dr = dirs[direction % 6]
         nc, nr = col + dc, row + dr
         if 0 <= nc < GRID_COLS and 0 <= nr < GRID_ROWS:
-            return self.get_tile(nc, nr)
+            return nc, nr
         return None
     
     def draw_grid(self, surface: pygame.Surface, color: Colors = Colors.CYAN):
@@ -111,7 +111,7 @@ class GridManager:
             for row in range(GRID_ROWS):
                 cx, cy = oddr_to_pixel(col, row)
                 center = pygame.math.Vector2(cx, cy)
-                draw_hex(surface, center, HEX_SIZE, color.value)
+                draw_hex(surface, center, HEX_SIZE, color)
 
     def draw_tracks(self, surface: pygame.Surface):
         for col in range(GRID_COLS):
@@ -120,4 +120,9 @@ class GridManager:
                 cx, cy = oddr_to_pixel(col, row)
                 center = pygame.math.Vector2(cx, cy)
                 tile.draw_tracks(surface, center, HEX_SIZE)
+
+    def highlight_tile(self, surface: pygame.Surface, col: int, row: int, color: Colors = Colors.ORANGE, line_width: int = 2):
+        cx, cy = oddr_to_pixel(col, row)
+        center = pygame.math.Vector2(cx, cy)
+        draw_hex(surface, center, HEX_SIZE, color, line_width=line_width)
 

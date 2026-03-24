@@ -15,9 +15,9 @@ TEXT_FONT_PATH = "assets/fonts/RubikMonoOne-Regular.ttf"
 STRAIGHT_TRACK_BUTTON_CENTER = pygame.Vector2(85, 250)
 CURVED_TRACK_BUTTON_CENTER = pygame.Vector2(215, 250)
 TRACK_BUTTON_SIZE = 48
-BUTTON_BORDER_COLOR = Colors.GREEN.value
-BUTTON_HIGHLIGHT_COLOR = Colors.WHITE.value
-BUTTON_SELECTED_COLOR = Colors.ORANGE.value
+BUTTON_BORDER_COLOR = Colors.GREEN
+BUTTON_HIGHLIGHT_COLOR = Colors.WHITE
+BUTTON_SELECTED_COLOR = Colors.ORANGE
 
 PAUSE_OPTIONS = ["Resume Game", "Main Menu", "Quit Game"]
 
@@ -63,8 +63,6 @@ class GameplayScreen(BaseScreen):
                 continue
 
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.pause:
-                    continue  # Ignore mouse clicks when paused
 
                 hex_coords = pixel_to_oddr(*mouse_pos)
                 inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
@@ -159,28 +157,24 @@ class GameplayScreen(BaseScreen):
         inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
 
         # Highlight hex under mouse
-        if 0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS:
-            cx, cy = oddr_to_pixel(*hex_coords)
-            center = pygame.math.Vector2(cx, cy)
-            draw_hex(self.screen, center, HEX_SIZE, Colors.ORANGE.value, line_width=2)
-            # Highlight active neighbor hexes
+        if inside_grid:
+            self.grid_manager.highlight_tile(self.screen, *hex_coords)
+            # Highlight neighbor hexes
+            for i in range(6):
+                neighbor_hex = self.grid_manager.neighbor_in_direction(*hex_coords, i)
+                if neighbor_hex:
+                    self.grid_manager.highlight_tile(self.screen, *neighbor_hex, line_width=1)
+            # Highlight neighbors of active edges
             tile = self.grid_manager.get_tile(*hex_coords)
             for edges in tile.active_edges:
                 for edge in edges:
-                    neighbor = self.grid_manager.neighbor_in_direction(*hex_coords, edge)
-                    if neighbor:
-                        neighbor.draw_hex_border(self.screen, center, HEX_SIZE, Colors.ORANGE, line_width=1)
+                    neighbor_hex = self.grid_manager.neighbor_in_direction(*hex_coords, edge)
+                    if neighbor_hex:
+                        self.grid_manager.highlight_tile(self.screen, *neighbor_hex, color=Colors.WHITE,  line_width=1)
 
         if inside_grid and self.selected_track_type:
-            # if pygame.mouse.get_visible():
-            #     pygame.mouse.set_visible(False)
-            #     print(f"Showing cursor for {self.selected_track_type} track at {hex_coords} with direction {self.selected_track_direction}")
             center = pygame.math.Vector2(*oddr_to_pixel(*hex_coords))
             if self.selected_track_type == 'straight':
                 straight_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
             else:
                 curved_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)
-        # else:
-        #     if not pygame.mouse.get_visible():
-        #         pygame.mouse.set_visible(True)
-        #         print("Hiding track cursor, showing regular mouse cursor")
