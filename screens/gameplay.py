@@ -21,6 +21,11 @@ BUTTON_SELECTED_COLOR = Colors.ORANGE
 
 PAUSE_OPTIONS = ["Resume Game", "Main Menu", "Quit Game"]
 
+# DEBUG
+HIGHLIGHT_CURSOR = False
+HIGHLIGHT_NEIGHBORS = False
+DRAW_GRID = True
+
 
 class GameplayScreen(BaseScreen):
     """Main gameplay screen."""
@@ -39,7 +44,7 @@ class GameplayScreen(BaseScreen):
         self.pause = False
         self.pause_menu = PauseMenu(self.screen)
 
-        self.grid_manager = GridManager((GRID_COLS, GRID_ROWS), show_grid=False)
+        self.grid_manager = GridManager((GRID_COLS, GRID_ROWS))
 
         # pygame.mouse.set_visible(False)  # Hide mouse cursor
 
@@ -68,6 +73,7 @@ class GameplayScreen(BaseScreen):
                 inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
                 inside_straight_button = (STRAIGHT_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE
                 inside_curved_button = (CURVED_TRACK_BUTTON_CENTER - mouse_pos).length() < TRACK_BUTTON_SIZE
+                tile_is_city = self.grid_manager.tile_is_city(*hex_coords)
                 
                 if event.button == 1:  # Left click
                     if inside_straight_button:
@@ -78,7 +84,7 @@ class GameplayScreen(BaseScreen):
                         self.selected_track_direction = 0  # Reset direction when selecting track type
                     elif not inside_grid:
                         self.selected_track_type = None  # Deselect track type if clicking outside grid and buttons
-                    elif inside_grid and self.selected_track_type:
+                    elif inside_grid and self.selected_track_type and not tile_is_city:
                         tile = self.grid_manager.get_tile(*hex_coords)
                         tile.add_track(
                             self.selected_track_type,
@@ -121,15 +127,15 @@ class GameplayScreen(BaseScreen):
         self.screen.blit(self.title_text, title_rect)
 
         # # Draw mouse position
-        # mouse_pos = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()
         # mouse_text = self.text_font.render(f"Mouse: {mouse_pos}", True, Colors.WHITE.value)
         # self.screen.blit(mouse_text, (15, 70))
         
-        # # Draw hex coordinates under mouse if within grid
-        # hex_coords = pixel_to_oddr(*mouse_pos)
-        # within_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
-        # hex_text = self.text_font.render(f"Hex: {hex_coords if within_grid else 'None'}", True, Colors.WHITE.value)
-        # self.screen.blit(hex_text, (15, 100))
+        # Draw hex coordinates under mouse if within grid
+        hex_coords = pixel_to_oddr(*mouse_pos)
+        within_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
+        hex_text = self.text_font.render(f"Hex: {hex_coords if within_grid else 'None'}", True, Colors.WHITE.value)
+        self.screen.blit(hex_text, (15, 100))
 
         self.draw_buttons()
         
@@ -139,7 +145,7 @@ class GameplayScreen(BaseScreen):
     def draw(self):
         self.screen.fill(Colors.BLACK.value)
         # Draw hex grid
-        if self.grid_manager.show_grid:
+        if DRAW_GRID:
             self.grid_manager.draw_grid(self.screen)
 
         # Draw tracks
@@ -157,7 +163,7 @@ class GameplayScreen(BaseScreen):
         inside_grid = (0 <= hex_coords[0] < GRID_COLS and 0 <= hex_coords[1] < GRID_ROWS)
 
         # Highlight hex under mouse
-        if inside_grid:
+        if inside_grid and HIGHLIGHT_CURSOR:
             self.grid_manager.highlight_tile(self.screen, *hex_coords)
             # Highlight neighbor hexes
             for i in range(6):
@@ -172,7 +178,7 @@ class GameplayScreen(BaseScreen):
                     if neighbor_hex:
                         self.grid_manager.highlight_tile(self.screen, *neighbor_hex, color=Colors.WHITE,  line_width=1)
 
-        if inside_grid and self.selected_track_type:
+        if inside_grid and self.selected_track_type and not self.grid_manager.tile_is_city(*hex_coords):
             center = pygame.math.Vector2(*oddr_to_pixel(*hex_coords))
             if self.selected_track_type == 'straight':
                 straight_cursor(self.screen, center, HEX_SIZE, self.selected_track_direction)

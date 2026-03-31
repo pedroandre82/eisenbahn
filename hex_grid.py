@@ -76,11 +76,23 @@ def draw_hex(surface, center: pygame.math.Vector2, size, color: Colors, line_wid
 
 
 class GridManager:
-    def __init__(self, grid_size: tuple[int, int], show_grid: bool = False):
+    def __init__(self, grid_size: tuple[int, int]):
         self.grid_size = grid_size
         self.grid: list[list[HexTile]] = [[HexTile() for row in range(grid_size[1])] for col in range(grid_size[0])]
         
-        self.show_grid = show_grid
+        self.city_tiles: set[tuple[int, int]] = set()
+        self._set_city_tiles()
+            
+            
+    def _set_city_tiles(self):
+        for coord in [(0, row) for row in range(0, 13, 2)]:
+            self.city_tiles.add(coord)
+        for coord in [(14, row) for row in range(1, 13, 2)]:
+            self.city_tiles.add(coord)
+
+    def tile_is_city(self, col: int, row: int) -> bool:
+        return (col, row) in self.city_tiles
+        
 
     def get_tile(self, col: int, row: int) -> HexTile:
         if 0 <= col < self.grid_size[0] and 0 <= row < self.grid_size[1]:

@@ -17,6 +17,7 @@ class HexTile:
         self.lights: list[LightState] = [LightState.RED] * 6  # Initialize all edges with red lights
         self.active_track: int = -1
         self.active_edges: set[tuple[int, int]] = set()
+        self.is_city: bool = False
 
     def add_track(self, track_type: str, dir: int) -> bool:
         """Add a track. Returns True if successful, False if it would overlap."""
